@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Community Service Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffd6e8 0%, #e0c3fc 50%, #c4b5fd 100%);
+            min-height: 100vh;
+            padding: 25px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(25px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header */
+        .dashboard-header {
+            background: #ffffff;
+            padding: 25px 35px;
+            border-radius: 25px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(224, 195, 252, 0.3);
+        }
+
+        .header-left h1 {
+            color: #5a3e6e;
+            font-size: 2.2em;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .header-left p {
+            color: #9d8baf;
+            font-size: 0.95em;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .notification-icon {
+            position: relative;
+            font-size: 1.8em;
+            cursor: pointer;
+            transition: transform 0.3s;
+            background: linear-gradient(135deg, #ffd6e8, #e0c3fc);
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-icon:hover {
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: linear-gradient(135deg, #ff9a9e, #fecfef);
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 0.55em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            box-shadow: 0 3px 10px rgba(255, 154, 158, 0.4);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: linear-gradient(135deg, #ffd6e8, #e0c3fc);
+            padding: 10px 20px;
+            border-radius: 20px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #c4b5fd, #e0c3fc);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.3em;
+            box-shadow: 0 5px 15px rgba(196, 181, 253, 0.4);
+        }
+
+        .user-details h3 {
+            color: #5a3e6e;
+            font-size: 1.05em;
+            font-weight: 700;
+        }
+
+        .user-details p {
+            color: #7a6893;
+            font-size: 0.85em;
+        }
+
+        .logout-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #ff9a9e, #fecfef);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(255, 154, 158, 0.3);
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 154, 158, 0.4);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            padding: 35px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(224, 195, 252, 0.25);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(180deg, #ffd6e8, #e0c3fc, #c4b5fd);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(224, 195, 252, 0.35);
+        }
+
+        /* Clickable certificate card */
+        .stat-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+
+        .stat-card.clickable::after {
+            content: '→';
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5em;
+            color: #c4b5fd;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .stat-card.clickable:hover::after {
+            opacity: 1;
+            right: 15px;
+        }
+
+        .stat-icon {
+            font-size: 3em;
+            margin-bottom: 18px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        .stat-card:nth-child(2) .stat-icon { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) .stat-icon { animation-delay: 0.4s; }
+        .stat-card:nth-child(4) .stat-icon { animation-delay: 0.6s; }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .stat-card h3 {
+            color: #9d8baf;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .stat-card .number {
+            font-size: 2.8em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #c4b5fd, #e0c3fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .change {
+            font-size: 0.85em;
+            color: #a8d5a4;
+            font-weight: 600;
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .section {
+            background: #ffffff;
+            padding: 35px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(224, 195, 252, 0.25);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.6em;
+            color: #5a3e6e;
+            padding-bottom: 12px;
+            border-bottom: 4px solid #e0c3fc;
+            display: inline-block;
+            font-weight: 700;
+        }
+
+        .view-all {
+            color: #c4b5fd;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: color 0.3s;
+        }
+
+        .view-all:hover {
+            color: #9d8baf;
+        }
+
+        /* Opportunity Cards */
+        .opportunity-card {
+            padding: 25px;
+            background: linear-gradient(135deg, #fef9ff, #faf8fc);
+            border-radius: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #e0c3fc;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(224, 195, 252, 0.15);
+        }
+
+        .opportunity-card:hover {
+            background: linear-gradient(135deg, #fef9ff, #f0e6f6);
+            transform: translateX(8px);
+            box-shadow: 0 8px 25px rgba(224, 195, 252, 0.25);
+        }
+
+        .opportunity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .opportunity-card h4 {
+            color: #5a3e6e;
+            font-size: 1.15em;
+            font-weight: 700;
+        }
+
+        .opportunity-badge {
+            background: linear-gradient(135deg, #ffd6e8, #fecfef);
+            color: #5a3e6e;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.7em;
+            font-weight: 700;
+            box-shadow: 0 3px 10px rgba(255, 214, 232, 0.4);
+        }
+
+        .opportunity-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 12px 0;
+            font-size: 0.85em;
+            color: #9d8baf;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(224, 195, 252, 0.15);
+            padding: 6px 12px;
+            border-radius: 12px;
+        }
+
+        .opportunity-card p {
+            color: #7a6893;
+            font-size: 0.9em;
+            margin-bottom: 18px;
+            line-height: 1.6;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .volunteers-count {
+            font-size: 0.85em;
+            color: #9d8baf;
+            font-weight: 600;
+        }
+
+        .apply-btn {
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #c4b5fd, #e0c3fc);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(196, 181, 253, 0.3);
+        }
+
+        .apply-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 8px 20px rgba(196, 181, 253, 0.4);
+        }
+
+        /* Event Items */
+        .event-item {
+            padding: 20px;
+            background: linear-gradient(135deg, #fef9ff, #faf8fc);
+            border-radius: 18px;
+            margin-bottom: 18px;
+            border-left: 5px solid #ffd6e8;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 214, 232, 0.15);
+        }
+
+        .event-item:hover {
+            background: linear-gradient(135deg, #fef9ff, #f0e6f6);
+            transform: translateX(8px);
+            box-shadow: 0 8px 25px rgba(255, 214, 232, 0.25);
+        }
+
+        .event-date {
+            color: #c4b5fd;
+            font-weight: 700;
+            font-size: 0.8em;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .event-item h4 {
+            color: #5a3e6e;
+            margin-bottom: 6px;
+            font-size: 1em;
+            font-weight: 700;
+        }
+
+        .event-item p {
+            color: #9d8baf;
+            font-size: 0.85em;
+        }
+
+        .event-time {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            font-size: 0.8em;
+            color: #c4b5fc;
+            font-weight: 600;
+        }
+
+        /* Events Container */
+        .events-container {
+            min-height: 100px;
+        }
+
+        .no-events {
+            text-align: center;
+            color: #9d8baf;
+            font-style: italic;
+            padding: 40px;
+            font-size: 1.1em;
+        }
+
+        /* Bottom Section */
+        .bottom-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        /* Progress Section */
+        .progress-item {
+            margin-bottom: 25px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .progress-header span {
+            font-size: 0.9em;
+            color: #7a6893;
+            font-weight: 600;
+        }
+
+        .progress-header .percentage {
+            color: #c4b5fd;
+            font-weight: 700;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: #f0e6f6;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd6e8, #e0c3fc, #c4b5fd);
+            border-radius: 15px;
+            transition: width 0.8s ease;
+            box-shadow: 0 2px 8px rgba(196, 181, 253, 0.4);
+        }
+
+        /* Leaderboard */
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 18px;
+            background: linear-gradient(135deg, #fef9ff, #faf8fc);
+            border-radius: 18px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(224, 195, 252, 0.15);
+        }
+
+        .leaderboard-item:hover {
+            background: linear-gradient(135deg, #fef9ff, #f0e6f6);
+            transform: translateX(8px);
+            box-shadow: 0 8px 25px rgba(224, 195, 252, 0.25);
+        }
+
+        .rank {
+            font-size: 1.8em;
+            font-weight: 700;
+            min-width: 45px;
+            text-align: center;
+        }
+
+        .leader-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #c4b5fd, #e0c3fc);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1em;
+            box-shadow: 0 5px 15px rgba(196, 181, 253, 0.4);
+        }
+
+        .leader-info {
+            flex: 1;
+        }
+
+        .leader-info h4 {
+            color: #5a3e6e;
+            font-size: 0.95em;
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+
+        .leader-info p {
+            color: #9d8baf;
+            font-size: 0.8em;
+        }
+
+        .leader-score {
+            font-weight: 800;
+            color: #c4b5fd;
+            font-size: 1.2em;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .dashboard-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .dashboard-header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            .header-right {
+                flex-direction: column;
+            }
+            .bottom-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="header-left">
+                <h1>Dashboard</h1>
+                <p id="currentDate"></p>
+            </div>
+            <div class="header-right">
+                <div class="notification-icon">
+                    <span class="notification-badge">3</span>
+                    🔔
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-details">
+                        <h3 id="userName">User</h3>
+                        <p>Volunteer</p>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+       <!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">⏱️</div>
+        <h3>Total Hours</h3>
+        <div class="number">128</div>
+        <div class="change">+12% from last month</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">🎉</div>
+        <h3>Events Attended</h3>
+        <div class="number">24</div>
+        <div class="change">+8 from last month</div>
+    </div>
+
+    <a href="certificate.html" class="stat-card-link">
+        <div class="stat-card">
+            <div class="stat-icon">🏆</div>
+            <h3>Certificates Earned</h3>
+            <div class="number">8</div>
+            <div class="change">+2 new this month</div>
+        </div>
+    </a>
+
+    <div class="stat-card">
+        <div class="stat-icon">⭐</div>
+        <h3>Impact Score</h3>
+        <div class="number">95</div>
+        <div class="change">Top 10% volunteer</div>
+    </div>
+</div>
+
+        <!-- Main Content -->
+        <div class="dashboard-content">
+            <!-- Opportunities Section -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Available Opportunities</h2>
+                    <a href="#" class="view-all">View All</a>
+                </div>
+                <div class="opportunity-card">
+                    <div class="opportunity-header">
+                        <h4>Beach Cleanup Drive</h4>
+                        <span class="opportunity-badge">NEW</span>
+                    </div>
+                    <div class="opportunity-meta">
+                        <span class="meta-item">🏖️ Baga Beach</span>
+                        <span class="meta-item">⏰ 8:00 AM - 12:00 PM</span>
+                        <span class="meta-item">📅 Dec 12</span>
+                    </div>
+                    <p>Help clean up our beautiful beaches and protect marine life. All equipment provided. Join us for a morning of environmental action!</p>
+                    <div class="card-footer">
+                        <span class="volunteers-count">23 volunteers joined</span>
+                        <button class="apply-btn" onclick="window.open('event.html?event=Beach Cleanup Drive&location=Baga Beach&date=Dec 12&time=8:00 AM - 12:00 PM', '_blank')">Apply Now</button>
+                    </div>
+                </div>
+                <div class="opportunity-card">
+                    <div class="opportunity-header">
+                        <h4>Food Distribution Program</h4>
+                        <span class="opportunity-badge">URGENT</span>
+                    </div>
+                    <div class="opportunity-meta">
+                        <span class="meta-item">🏛️ Community Center</span>
+                        <span class="meta-item">⏰ 6:00 PM - 9:00 PM</span>
+                        <span class="meta-item">📅 Dec 10</span>
+                    </div>
+                    <p>Assist in distributing meals to families in need. Make a direct impact on hunger in our community. No experience required.</p>
+                    <div class="card-footer">
+                        <span class="volunteers-count">45 volunteers joined</span>
+                        <button class="apply-btn" onclick="window.open('event.html?event=Food Distribution Program&location=Community Center&date=Dec 10&time=6:00 PM - 9:00 PM', '_blank')">Apply Now</button>
+                    </div>
+                </div>
+                <div class="opportunity-card">
+                    <div class="opportunity-header">
+                        <h4>Teaching Assistant</h4>
+                    </div>
+                    <div class="opportunity-meta">
+                        <span class="meta-item">🏫 Local School</span>
+                        <span class="meta-item">⏰ 3:00 PM - 5:00 PM</span>
+                        <span class="meta-item">📅 Dec 14</span>
+                    </div>
+                    <p>Help children with homework and tutoring. Share your knowledge and inspire young minds. Perfect for college students!</p>
+                    <div class="card-footer">
+                        <span class="volunteers-count">18 volunteers joined</span>
+                        <button class="apply-btn" onclick="window.open('event.html?event=Teaching Assistant&location=Local School&date=Dec 14&time=3:00 PM - 5:00 PM', '_blank')">Apply Now</button>
+                    </div>
+                </div>
+                <div class="opportunity-card">
+                    <div class="opportunity-header">
+                        <h4>Tree Plantation Campaign</h4>
+                    </div>
+                    <div class="opportunity-meta">
+                        <span class="meta-item">🌳 City Park</span>
+                        <span class="meta-item">⏰ 7:00 AM - 11:00 AM</span>
+                        <span class="meta-item">📅 Dec 16</span>
+                    </div>
+                    <p>Join us in planting 500 trees to combat climate change and beautify our city. Be part of environmental change!</p>
+                    <div class="card-footer">
+                        <span class="volunteers-count">67 volunteers joined</span>
+                        <button class="apply-btn" onclick="window.open('event.html?event=Tree Plantation Campaign&location=City Park&date=Dec 16&time=7:00 AM - 11:00 AM', '_blank')">Apply Now</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAST EVENTS SECTION -->
+           <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Past Events</h2>
+                    <a href="#" class="view-all" onclick="populateEvents(); return false;">Refresh</a>
+                </div>
+                <div id="pastEvents" class="events-container">
+                    <div class="no-events">Loading past events...</div>
+                </div>
+            </div>
+
+            <!-- UPCOMING EVENTS SECTION (NEW) -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Upcoming Events</h2>
+                    <a href="#" class="view-all" onclick="populateEvents(); return false;">Refresh</a>
+                </div>
+                <div id="upcomingEvents" class="events-container">
+                    <div class="no-events">Loading upcoming events...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Section -->
+        <div class="bottom-section">
+            <!-- Goals Progress -->
+            <div class="section">
+                <h2 class="section-title">Your Goals Progress</h2>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span>Monthly Hours Goal</span>
+                        <span class="percentage">80%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 80%"></div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span>Events Participation</span>
+                        <span class="percentage">60%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 60%"></div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span>Skill Development</span>
+                        <span class="percentage">45%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 45%"></div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span>Community Impact</span>
+                        <span class="percentage">90%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 90%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leaderboard -->
+            <div class="section">
+                <h2 class="section-title">Top Volunteers</h2>
+                <div class="leaderboard-item">
+                    <span class="rank">🥇</span>
+                    <div class="leader-avatar">S</div>
+                    <div class="leader-info">
+                        <h4>Shraddha</h4>
+                        <p>245 hours volunteered</p>
+                    </div>
+                    <span class="leader-score">245</span>
+                </div>
+                <div class="leaderboard-item">
+                    <span class="rank">🥈</span>
+                    <div class="leader-avatar">M</div>
+                    <div class="leader-info">
+                        <h4>Samiksha</h4>
+                        <p>198 hours volunteered</p>
+                    </div>
+                    <span class="leader-score">198</span>
+                </div>
+                <div class="leaderboard-item">
+                    <span class="rank">🥉</span>
+                    <div class="leader-avatar">E</div>
+                    <div class="leader-info">
+                        <h4>Aishwarya</h4>
+                        <p>176 hours volunteered</p>
+                    </div>
+                    <span class="leader-score">176</span>
+                </div>
+                <div class="leaderboard-item">
+                    <span class="rank">4</span>
+                    <div class="leader-avatar">A</div>
+                    <div class="leader-info">
+                        <h4>Tejal</h4>
+                        <p>152 hours volunteered</p>
+                    </div>
+                    <span class="leader-score">152</span>
+                </div>
+                <div class="leaderboard-item">
+                    <span class="rank">5</span>
+                    <div class="leader-avatar" id="currentUserRank">U</div>
+                    <div class="leader-info">
+                        <h4 id="leaderboardUser">You</h4>
+                        <p>128 hours volunteered</p>
+                    </div>
+                    <span class="leader-score">128</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   <script>
+/* ---------- Auth check ---------- */
+if (localStorage.getItem('isLoggedIn') !== 'true') {
+  window.location.href = 'login.html';
+}
+
+/* ---------- User data ---------- */
+const userEmail = localStorage.getItem('userEmail') || 'user@example.com';
+const userName = userEmail.split('@')[0];
+const userInitial = userName.charAt(0).toUpperCase();
+
+document.getElementById('userName').innerText = userName;
+document.getElementById('userAvatar').innerText = userInitial;
+document.getElementById('leaderboardUser').innerText = userName;
+document.getElementById('currentUserRank').innerText = userInitial;
+
+/* ---------- Date ---------- */
+document.getElementById('currentDate').innerText =
+  new Date().toDateString();
+
+/* ---------- Logout ---------- */
+function logout() {
+  localStorage.removeItem('isLoggedIn');
+  localStorage.removeItem('userEmail');
+  window.location.href = 'login.html';
+}
+
+/* ---------- Events Loader ---------- */
+function populateEvents() {
+  const pastEvents = document.getElementById('pastEvents');
+  const upcomingEvents = document.getElementById('upcomingEvents');
+
+  pastEvents.innerHTML = `
+    <div class="event-item">
+      <div class="event-date">Nov 20, 2024</div>
+      <h4>River Cleanup</h4>
+      <p>Cleaned river banks with 30 volunteers</p>
+    </div>
+    <div class="event-item">
+      <div class="event-date">Nov 10, 2024</div>
+      <h4>Food Drive</h4>
+      <p>Distributed food to 200+ families</p>
+    </div>
+  `;
+
+  upcomingEvents.innerHTML = `
+    <div class="event-item">
+      <div class="event-date">Dec 12, 2024</div>
+      <h4>Beach Cleanup</h4>
+      <p>8:00 AM – 12:00 PM</p>
+    </div>
+    <div class="event-item">
+      <div class="event-date">Dec 16, 2024</div>
+      <h4>Tree Plantation</h4>
+      <p>7:00 AM – 11:00 AM</p>
+    </div>
+  `;
+}
+
+/* ---------- Load events on page load ---------- */
+populateEvents();
+</script>
